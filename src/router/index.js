@@ -55,6 +55,50 @@ export const constantRoutes = [
     }]
   },
 
+
+  //商品管理相关的路由
+
+  {
+    path:'/product',
+    component:Layout,  //首先得显示一级路由组件
+    name:'Product',
+    redirect: '/product/trademark/list',
+    meta:{title: '商品管理', icon: 'el-icon-s-shop'},
+    children:[
+      {
+        path:'trademark/list',
+        component: () => import('@/views/product/trademark/List'),
+        name:'Trademark',
+        meta:{title: '品牌管理'}
+      },
+      {
+        path:'attr/list',
+        component: () => import('@/views/product/attr/List'),
+        name:'Attr',
+        meta:{title: '属性管理'}
+      },
+      {
+        path:'sku/list',
+        component: () => import('@/views/product/sku/List'),
+        name:'Sku',
+        meta:{title: 'sku管理'}
+      },
+      {
+        path:'spu/list',
+        component: () => import('@/views/product/spu/List'),
+        name:'Spu',
+        meta:{title: 'spu管理'}
+      },
+    ]
+  },
+
+
+
+
+
+
+
+
   //删除不需要的路由
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
