@@ -4,9 +4,9 @@ import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
-    token: getToken(),
-    name: '',
-    avatar: ''
+    token: getToken(), //登录后的token存储，先从cookies当中获取，获取不到再登录第一次设置  
+    name: '', //获取用户信息后存储用户的名称
+    avatar: '' //获取用户信息后存储用户的头像
   }
 }
 
@@ -16,14 +16,14 @@ const mutations = {
   RESET_STATE: (state) => {
     Object.assign(state, getDefaultState())
   },
+  //登录后设置用户token  存储到state
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_NAME: (state, name) => {
-    state.name = name
-  },
-  SET_AVATAR: (state, avatar) => {
-    state.avatar = avatar
+  //获取用户信息后设置用户信息 存储到state
+  SET_USERINFO(state,userInfo){
+    state.name = userInfo.name
+    state.avatar = userInfo.avatar
   }
 }
 
@@ -34,14 +34,29 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        commit('SET_TOKEN', data.token) //提交第一次设置token
+        setToken(data.token) //存储token到cookies当中
         resolve()
       }).catch(error => {
         reject(error)
       })
     })
   },
+
+  // async login({ commit }, userInfo){
+  //   const { username, password } = userInfo
+  //   const response = await login({ username: username.trim(), password: password })
+  //   if(response.code === 20000){
+  //     const { data } = response
+  //     commit('SET_TOKEN', data.token) //提交第一次设置token
+  //     setToken(data.token) //存储token到cookies当中
+  //     return 'ok'
+  //   }else{
+  //     return Promise.reject(new Error('failed'))
+  //   }
+  // }
+  // },
+
 
   // get user info
   getInfo({ commit, state }) {
@@ -52,11 +67,11 @@ const actions = {
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
+        // const { name, avatar } = data
+        // commit('SET_NAME', name)
+        // commit('SET_AVATAR', avatar)
 
-        const { name, avatar } = data
-
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_USERINFO',data)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -69,7 +84,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
         removeToken() // must remove  token  first
-        resetRouter()
+        resetRouter() //重新设置路由
         commit('RESET_STATE')
         resolve()
       }).catch(error => {
@@ -89,7 +104,8 @@ const actions = {
 }
 
 export default {
-  namespaced: true,
+  namespaced: true, //命名空间  写了它 以后访问actions getters mutations 就得加上名称前缀  user/login
+                    //可以让多个模块有相同的actions getters mutations   home/login
   state,
   mutations,
   actions

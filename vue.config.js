@@ -36,7 +36,16 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    // before: require('./mock/mock-server.js')  //禁用mock数据
+    // 代理配置
+    proxy:{
+      '/dev-api':{
+        target:'http://39.99.186.36',
+        pathRewrite:{
+          '^/dev-api':''
+        }
+      }
+    }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

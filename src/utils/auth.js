@@ -1,4 +1,4 @@
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie' //js-cookie是一个第三方库，可以简化cookies的操作
 
 const TokenKey = 'vue_admin_template_token'
 
