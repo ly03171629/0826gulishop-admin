@@ -10,16 +10,29 @@ const getDefaultState = () => {
   }
 }
 
+
+
 const state = getDefaultState()
 
+
 const mutations = {
+
+  // RESET_STATE: (state) => {
+  //   state.token = getToken()
+  //   state.name = ''
+  //   state.avatar = ''
+  // },
+  // 就是把state当中原来的东西全部清空
   RESET_STATE: (state) => {
+    //Object.assign 方法是合并复制  是把第二个参数对象当中的属性 复制合并到第一个参数对象当中
     Object.assign(state, getDefaultState())
   },
   //登录后设置用户token  存储到state
   SET_TOKEN: (state, token) => {
     state.token = token
   },
+
+
   //获取用户信息后设置用户信息 存储到state
   SET_USERINFO(state,userInfo){
     state.name = userInfo.name
