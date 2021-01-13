@@ -14,6 +14,8 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+import CategorySelector from '@/components/CategorySelector'
+
 
 import * as API from '@/api'
 // $API = {
@@ -21,6 +23,12 @@ import * as API from '@/api'
 //   attr:{},
 //   sku:{}
 // }
+
+
+// 全局注册组件
+Vue.component('CategorySelector',CategorySelector)
+
+
 
 
 /**

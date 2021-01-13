@@ -1,7 +1,9 @@
 export {default as trademark} from './product/trademark'
-// export {default as attr }from './product/attr'
+export {default as attr } from './product/attr'
+export {default as category} from './product/category'
 
-
+// this.$API.trademark.delete
+// this.$API.attr.delete
 //export {default as trademark} from './product/trademark'
 //引入并暴露
 //可以这么理解
