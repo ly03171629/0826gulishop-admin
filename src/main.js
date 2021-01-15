@@ -15,6 +15,7 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 import CategorySelector from '@/components/CategorySelector'
+import HintButton from '@/components/HintButton'
 
 
 import * as API from '@/api'
@@ -27,6 +28,7 @@ import * as API from '@/api'
 
 // 全局注册组件
 Vue.component('CategorySelector',CategorySelector)
+Vue.component('HintButton',HintButton)
 
 
 

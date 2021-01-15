@@ -4,7 +4,6 @@ export default {
   //根据选中三级分类后获取平台属性列表
   // GET /admin/product/attrInfoList/{category1Id}/{category2Id}/{category3Id}
   // attrInfoList
-
   getList(category1Id,category2Id,category3Id){
     return request.get(`/admin/product/attrInfoList/${category1Id}/${category2Id}/${category3Id}`)
   },
