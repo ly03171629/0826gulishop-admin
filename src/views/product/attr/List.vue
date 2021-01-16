@@ -40,12 +40,16 @@
                 title="修改"
                 @click="showUpdateDiv(row)"
               ></HintButton>
-              <HintButton
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-                title="删除"
-              ></HintButton>
+
+              <el-popconfirm :title="`你确认删除${row.attrName}吗？`" @onConfirm="deleteAttr(row)">
+                <HintButton
+                  slot="reference"
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                  title="删除"
+                ></HintButton>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -98,8 +102,11 @@
             </template>
           </el-table-column>
           <el-table-column prop="prop" label="操作" width="width">
-            <template slot-scope="{row,$index}">
-              <el-popconfirm :title="`确定要删除${row.valueName}吗？`" @onConfirm="attrForm.attrValueList.splice($index,1)">
+            <template slot-scope="{ row, $index }">
+              <el-popconfirm
+                :title="`确定要删除${row.valueName}吗？`"
+                @onConfirm="attrForm.attrValueList.splice($index, 1)"
+              >
                 <HintButton
                   slot="reference"
                   type="danger"
@@ -112,7 +119,7 @@
           </el-table-column>
         </el-table>
 
-        <el-button type="primary">保存</el-button>
+        <el-button type="primary" @click="save" :disabled="attrForm.attrValueList.length === 0">保存</el-button>
         <el-button @click="isShowList = true">取消</el-button>
       </div>
     </el-card>
@@ -200,6 +207,8 @@ export default {
     addAttrValue() {
       //我们可以给属性值列表当中添加一个空的对象，保证表格当中首先先出现一行
       this.attrForm.attrValueList.push({
+        // 添加属性也好  修改属性也罢 都有可能添加属性值
+        // 添加属性值的时候，属性值对象当中属性的id就是attrId，
         attrId: this.attrForm.id, //这个属性说的是属性值所属属性的id，如果是添加属性，这个id是没有的，如果是修改属性，这个id是有的
         valueName: "", //我现在只是添加了一个空的对象，属性都还没有呢，只是在占位,什么时候这个属性值有值，得让用户自己输入，输入了就有值
         isEdit: true, //添加属性值的时候，我们属性值对象标识数据直接就是编辑模式
@@ -235,7 +244,7 @@ export default {
       //在input变为span之前，我们需要校验用户输入的数据合法性
       //1、用户输入的数据不能为空
       let valueName = row.valueName;
-      if (!valueName.trim()) {
+      if (valueName.trim() === "") {
         this.$message.info("输入的属性值名称不能为空");
         row.valueName = ""; //清空输入框不合法的数据
         return;
@@ -280,6 +289,52 @@ export default {
       // this.$nextTick 页面的最近一次更新完成之后执行回调,一次就完了
       // updated  只要页面有数据更新 就会执行
     },
+    //保存
+    async save() {
+      //获取收集的参数
+      let attr = this.attrForm;
+      //整理参数  (因为我们收集的参数 里面东西不一定是和请求需要的一样)
+      // 1、如果属性当中的属性值有空串的我们得去除掉
+      // 2、请求的时候得把不需要的属性值对象当中的属性数据去除掉，比如属性值当中的isEdit
+
+      attr.attrValueList = attr.attrValueList.filter((item) => {
+        if (item.valueName !== "") {
+          delete item.isEdit; //过滤的同，如果属性值对象的属性名称不为空串，就去除它的isEdit属性
+          return true;
+        }
+      });
+      // 3、当属性当中属性值的列表是空的时候，代表没有属性值，不发请求
+      if (attr.attrValueList.length === 0) {
+        this.$message.info("属性必须有属性值");
+        return;
+      }
+
+      //发请求
+      try {
+        //成功干啥
+        await this.$API.attr.addOrUpdate(attr);
+        //1、提示
+        this.$message.success("保存成功");
+        //2、返回到列表页
+        this.isShowList = true;
+        //3、重新获取属性列表数据
+        this.getAttrList();
+      } catch (error) {
+        //失败干啥
+        this.$message.error("保存失败");
+      }
+    },
+    //删除属性
+    async deleteAttr(row){
+      try {
+        await this.$API.attr.delete(row.id)
+        this.$message.success('删除成功')
+        this.getAttrList()
+      } catch (error) {
+        this.$message.error('删除失败')
+      }
+      
+    }
   },
 };
 </script>

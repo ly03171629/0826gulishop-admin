@@ -11,7 +11,7 @@ export default {
   // DELETE /admin/product/deleteAttr/{attrId}
   // deleteAttr
   delete(attrId){
-    return request.delete(` /admin/product/deleteAttr/${attrId}`)
+    return request.delete(`/admin/product/deleteAttr/${attrId}`)
   },
 
   // 添加或者修改属性
