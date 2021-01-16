@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-card>
-      <CategorySelector @changeCategory="changeCategory"></CategorySelector>
+      <CategorySelector @changeCategory="changeCategory" :isShowList="isShowList"></CategorySelector>
     </el-card>
     <!-- 第一个card当中是三级联动，第二个card是属性列表相关的 -->
     <el-card style="margin-top: 20px">
@@ -333,7 +333,6 @@ export default {
       } catch (error) {
         this.$message.error('删除失败')
       }
-      
     }
   },
 };
