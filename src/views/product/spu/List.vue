@@ -63,7 +63,8 @@
       </div>
 
       <!-- 添加和修改spu的页面组件 -->
-      <SpuForm v-show="isShowSpuForm"></SpuForm>
+      <SpuForm v-show="isShowSpuForm" ref="spu" :visible.sync="isShowSpuForm"></SpuForm>
+      <!-- <SpuForm v-show="isShowSpuForm" ref="spu" :visible="isShowSpuForm" @update:visible="isShowSpuForm = $event"></SpuForm> -->
 
       <!-- 添加sku的页面组件 -->
       <SkuForm v-show="isShowSkuForm"></SkuForm>
@@ -142,11 +143,16 @@ export default {
     //点击添加spu按钮
     showAddSpuForm(){
       this.isShowSpuForm = true
+      this.$refs.spu.initAddSpuFormData()
     },
     //点击修改spu按钮
     showUpdateSpuForm(row){
       this.isShowSpuForm = true
+      //拿到子组件对象，可以使用组件当中的数据也可以调用子组件当中的方法
+      this.$refs.spu.initUpdateSpuFormData(row)
     },
+
+
     //点击添加sku按钮
     showAddSkuForm(row){
       this.isShowSkuForm = true
