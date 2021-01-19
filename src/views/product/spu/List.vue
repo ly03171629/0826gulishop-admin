@@ -79,7 +79,7 @@
       <!-- <SpuForm v-show="isShowSpuForm" ref="spu" :visible="isShowSpuForm" @update:visible="isShowSpuForm = $event"></SpuForm> -->
 
       <!-- 添加sku的页面组件 -->
-      <SkuForm v-show="isShowSkuForm"></SkuForm>
+      <SkuForm v-show="isShowSkuForm" ref="sku" :visible.sync="isShowSkuForm"></SkuForm>
 
       <!-- <div>
         添加或者修改的页面
@@ -166,6 +166,7 @@ export default {
     //点击添加sku按钮
     showAddSkuForm(row) {
       this.isShowSkuForm = true;
+      this.$refs.sku.initAddSkuFormData(row,this.category1Id,this.category2Id);
     },
 
     //成功返回后让父组件干活
