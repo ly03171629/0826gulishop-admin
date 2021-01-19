@@ -80,6 +80,7 @@
           </el-table-column>
           <el-table-column prop="saleAttrName" label="属性名" width="150">
           </el-table-column>
+
           <el-table-column prop="prop" label="属性值名称列表" width="width">
             <template slot-scope="{ row, $index }">
               <!--   -->
@@ -122,6 +123,7 @@
               >
             </template>
           </el-table-column>
+
           <el-table-column prop="prop" label="操作" width="150">
             <!-- @click="spuForm.spuSaleAttrList.splice($index,1)" -->
             <template slot-scope="{ row, $index }">
@@ -151,8 +153,8 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-button type="primary">保存</el-button>
-        <el-button @click="$emit('update:visible', false)">取消</el-button>
+        <el-button type="primary" @click="save">保存</el-button>
+        <el-button @click="cancel">取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -200,6 +202,8 @@ export default {
         ],
       },
 
+      category3Id:'',
+
       spuImageList: [], //获取图片列表到时候存在这个里面，最后再把这个图片列表整理完成放到spuForm里面
       trademarkList: [], //获取所有的品牌列表存在这里面
       baseSaleAttrList: [], //获取所有的spu销售属性存在这里面
@@ -234,6 +238,8 @@ export default {
 
     //请求获取修改的初始化数据
     async initUpdateSpuFormData(spu) {
+      this.category3Id = spu.category3Id
+
       //函数当中在发那4个请求
       //获取spu的详情
       //http://localhost:9529/dev-api/admin/product/getSpuById/4
@@ -270,7 +276,8 @@ export default {
       }
     },
     //请求获取添加的初始化数据
-    async initAddSpuFormData() {
+    async initAddSpuFormData(category3Id) {
+      this.category3Id = category3Id
       //函数当中在发那2个请求
       //获取所有的品牌列表数据
       //http://localhost:9529/dev-api/admin/product/baseTrademark/getTrademarkList
@@ -316,6 +323,7 @@ export default {
     handleInputConfirm(row) {
       //从当前行也就是当前的这个属性对象身上，把刚才input输入的数据给获取到
       let saleAttrValueName = row.inputValue;
+      let baseSaleAttrId = row.baseSaleAttrId  //属性的id也得带上
 
       //判断这个值是否为空
       if (saleAttrValueName.trim() === "") {
@@ -339,6 +347,7 @@ export default {
       //把数据变为想要的结构
       let obj = {
         saleAttrValueName,
+        baseSaleAttrId
       };
 
       //把结构数据添加到对应的属性值列表当中
@@ -350,6 +359,109 @@ export default {
       //再让input变为按钮
       row.inputVisible = false;
     },
+    //保存操作
+    async save(){
+      //获取收集的参数数据
+      let {spuForm,spuImageList,category3Id} = this
+      //整理参数
+      // 1、spuImageList里面的图片格式要整理
+      //需要的
+      // {
+      //   imgName: "string",
+      //   imgUrl: "string",
+      // },
+
+      //我们现在的图片格式
+      // {
+      //   id: (...)
+      //   imgName: (...)
+      //   imgUrl: (...)
+      //   name: (...)
+      //   spuId: (...)
+      //   status: "success"
+      //   uid: 1610949980533
+      //   url: (...)
+      // }
+
+      // {
+      //   name: "2.jpg"
+      //   percentage: 100
+      //   raw: File
+      //   response: {code: 201, message: "失败", data: null, ok: false}
+      //   size: 706828
+      //   status: "success"
+      //   uid: 1610949989625
+      //   url: "blob:http://localhost:9528/9e2c8ea6-9079-4671-b86f-afd7eabecb95"
+      // }
+    
+      spuForm.spuImageList = spuImageList.map(item => 
+        ({
+          imgName:item.name,
+          imgUrl:item.imgUrl||item.response.data
+        })
+      )
+
+      // 2、整理收集category3Id
+      spuForm.category3Id = category3Id
+
+      // 3、删除属性当中的inputVisible和inputValue
+      spuForm.spuSaleAttrList.forEach(item => {
+        delete item.inputVisible
+        delete item.inputValue
+      })
+      
+      //发请求
+      try {
+        //成功干啥
+        await this.$API.spu.addUpdate(spuForm)
+        //1、提示
+        this.$message.success('保存成功')
+        //2、返回列表页
+        this.$emit('update:visible', false) //仅仅是为了返回
+        //3、通知父组件成功返回，父组件需要做一些事情，重新请求获取数据
+        this.$emit('successBack') //返回后让父组件做事
+        //4、清空当前组件的data当中所有的数据
+        //为什么要清，如果先修改，再添加，数据依然存在，因为不是路由组件，里面数据必须手动清
+        this.resetData()
+      } catch (error) {
+        //失败干啥
+        this.$message.error('保存失败')
+      }
+    },
+    //清空data当中数据
+    resetData(){
+      this.spuForm = {
+        // 这个里面初始化的所有数据，都是为了添加的时候收集所需要的
+        //如果修改spu,是将获取到的spu详情数据，直接覆盖这里面的所有
+        category3Id: 0,
+        spuName: "",
+        description: "",
+        tmId: "",
+        spuImageList: [],
+        spuSaleAttrList: [],
+      }
+
+      this.category3Id = ''
+
+      this.spuImageList = [] //获取图片列表到时候存在这个里面，最后再把这个图片列表整理完成放到spuForm里面
+      this.trademarkList = [] //获取所有的品牌列表存在这里面
+      this.baseSaleAttrList = [] //获取所有的spu销售属性存在这里面
+
+      this.spuSaleAttrIdName = ""//准备选择select之后收集销售id，但是最后是不是要这个id，不一定，先假设是
+
+      //这两个数据是上传图片用的
+      this.dialogImageUrl = ""
+      this.dialogVisible = false
+    },
+    //取消操作
+    cancel(){
+      // 1、得返回到父组件
+      this.$emit('update:visible', false) 
+      // 2、通知父组件 清空标识数据
+      this.$emit('cancelBack')
+      // 3、也得重置data的数据
+      this.resetData()
+    }
   },
   computed: {
     //所有的销售属性除去自身的，剩余的销售属性列表
