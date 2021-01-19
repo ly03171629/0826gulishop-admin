@@ -195,7 +195,7 @@ export default {
       // console.log(val)
       this.checkedImageList = val //收集图片列表到选中的图片数组当中，不是我们原始展示的数组
     },
-    
+
     //设置默认图片
     setDefault(row){
       //排它设置默认图片
