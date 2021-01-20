@@ -314,6 +314,8 @@ export default {
     showInput(row) {
       //显示当前行的input,当前行就是当前的这个销售属性
       this.$set(row, "inputVisible", true);
+      //添加这一行，目的是让用户点击添加按钮的时候，row身上有inputValue，初始值是空串，否则就是undefined
+      this.$set(row, "inputValue", ''); 
       // 自动获取焦点
       this.$nextTick(() => {
         this.$refs.saveTagInput.focus();
@@ -328,6 +330,7 @@ export default {
       //判断这个值是否为空
       if (saleAttrValueName.trim() === "") {
         row.inputValue = "";
+        row.inputVisible = false //想让输入框再变回按钮，添加这行，不要也无所谓
         return;
       }
 

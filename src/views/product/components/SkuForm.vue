@@ -96,8 +96,8 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary">保存</el-button>
-        <el-button @click="$emit('update:visible', false)">取消</el-button>
+        <el-button type="primary" @click="save">保存</el-button>
+        <el-button @click="cancel">取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -112,6 +112,8 @@ export default {
         // 父组件传过来
         tmId: "",
         category3Id: "",
+        spuId:'',  //这个id是告诉后台给哪个spu添加sku
+
 
         //v-model直接收集
         price: "",
@@ -160,6 +162,8 @@ export default {
       attrList: [],
       spuSaleAttrList: [],
       spuImageList: [],   //用来展示所有的图片列表
+
+
       checkedImageList:[] //这个是用来收集图片的列表
     };
   },
@@ -203,6 +207,106 @@ export default {
       row.isDefault = '1'
       //一旦设置完默认图片，赶紧把默认图片的路径收集到位
       this.skuForm.skuDefaultImg = row.imgUrl
+    },
+    //保存sku
+    async save(){
+      //1、获取收集的参数
+      let {skuForm,spu,attrList,spuSaleAttrList,checkedImageList} = this
+      //2、整理参数
+      //整理父组件传过来的
+      skuForm.tmId = spu.tmId
+      skuForm.category3Id = spu.category3Id
+      skuForm.spuId = spu.id
+      //整理图片列表
+      skuForm.skuImageList = checkedImageList.map(item => {
+        return {
+          imgName:item.imgName,
+          imgUrl:item.imgUrl,
+          isDefault:item.isDefault,
+          spuImgId:item.id
+        }
+      })
+      //要求的结构
+      // {
+      //   imgName: "string",
+      //   imgUrl: "string",
+      //   isDefault: "string",
+      //   spuImgId: 0,
+      // },
+
+      //我们的结构
+      // id:12
+      // imgName:"7155bba4c363065f.jpg"
+      // imgUrl:"http://47.93.148.192:8080/group1/M00/00/02/rBHu8l-rgfWAVRWzAABUiOmA0ic932.jpg"
+      // isDefault:"0"
+      // spuId:3
+      //整理平台属性和销售属性
+      skuForm.skuAttrValueList = attrList.reduce((prev,item) => {
+        if(item.attrIdValueId){
+          let [attrId,valueId] = item.attrIdValueId.split(':')
+          let obj = {
+            attrId,
+            valueId
+          }
+          prev.push(obj)
+        }
+        return prev
+      },[])
+
+      skuForm.skuSaleAttrValueList = spuSaleAttrList.reduce((prev,item) => {
+        if(item.spuAttrIdValueId){
+          let [saleAttrId,saleAttrValueId] = item.spuAttrIdValueId.split(':')
+          let obj = {
+            saleAttrId,
+            saleAttrValueId
+          }
+          prev.push(obj)
+        }
+        return prev
+      },[])
+
+      //3、发请求
+      try {
+        //4、成功
+        await this.$API.sku.addUpdate(skuForm)
+        //1、提示
+        this.$message.success('保存sku成功')
+        //2、返回列表页,也以后，不需要让父组件再发请求获取spu的列表数据，因此简单了
+        this.$emit('update:visible',false)
+        //3、重置当前data的数据
+        this.resetData()
+      } catch (error) {
+        //5、失败
+        this.$message.error('保存sku失败')
+      }
+    },
+    //重置data的数据
+    resetData(){
+      this.skuForm =  {
+        tmId: "",
+        category3Id: "",
+        spuId:'',  //这个id是告诉后台给哪个spu添加sku
+        price: "",
+        weight: "",
+        skuName: "",
+        skuDesc: "",
+        skuDefaultImg: "",
+        skuAttrValueList: [ ],
+        skuImageList: [],
+        skuSaleAttrValueList: [],
+      }
+      this.spu = {}
+      this.attrList = []
+      this.spuSaleAttrList = []
+      this.spuImageList = []   //用来展示所有的图片列表
+      this.checkedImageList = [] //这个是用来收集图片的列表
+    },
+    //取消sku操作
+    cancel(){
+      //返回到spu列表页
+      this.$emit('update:visible',false)
+      //重置data数据
+      this.resetData()
     }
   },
 };
