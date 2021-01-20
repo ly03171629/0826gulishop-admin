@@ -8,6 +8,9 @@ import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 
 import '@/styles/index.scss' // global css
 
+//引入v-charts的配置文件
+import '@/plugins/vcharts'
+
 import App from './App'
 import store from './store'
 import router from './router'
