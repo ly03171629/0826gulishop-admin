@@ -267,6 +267,7 @@ export default {
     },
   },
 
+  //处理三级联动的可操作性
   watch: {
     isShowSpuForm(newVal, oldVal) {
       this.isShowList = !newVal;

@@ -30,6 +30,9 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+
+//包含所有的用户都能操作的路由，也就是不需要权限就能操作的路由
+//常量路由
 export const constantRoutes = [
   {
     path: '/login',
@@ -54,10 +57,14 @@ export const constantRoutes = [
       meta: { title: '首页', icon: 'dashboard' }
     }]
   },
+]
 
 
-  //商品管理相关的路由
+  //商品管理相关的路由,不是常量路由
+  //是根据用户返回的权限数据信息决定是否注册这个路由，这个路由不是常量路由
 
+//页面所有异步路由，需要根据权限数据来从这个路由数组当中过滤出用户所拥有的异步路由
+export const allAsyncRoutes = [
   {
     path:'/product',
     component:Layout,  //首先得显示一级路由组件
@@ -91,18 +98,14 @@ export const constantRoutes = [
       },
     ]
   },
-
-
-
-
-
-
-
-
-  //删除不需要的路由
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
 ]
+
+//任意路由，用户随意输入的非法路由路由，全部都会转到404路由界面
+//注册这个路由的时候，一定要放在最后面注册
+export const anyRoute = { path: '*', redirect: '/404', hidden: true }
+
+
+
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support
