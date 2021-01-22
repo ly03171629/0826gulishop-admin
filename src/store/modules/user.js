@@ -1,7 +1,8 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo } from '@/api/acl/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter,allAsyncRoutes,anyRoute,constantRoutes } from '@/router'
 import router from '@/router'
+import cloneDeep from 'lodash/cloneDeep'
 
 const getDefaultState = () => {
   return {
@@ -136,7 +137,12 @@ const actions = {
 
         //得把data.routes换成我们需要的路由数组
 
-        commit('SET_ROUTES',filterAsyncRoutes(allAsyncRoutes,data.routes))
+
+        //filterAsyncRoutes函数会把allAsyncRoutes内部原本的子路由过滤掉一部分
+        //原本的子路由不在了，你拿到的是一份残缺的子路由，和上次登录的用户一样的
+        //所以在过滤的时候，记得把所有的异步路由做深拷贝，然后再去操作，不会影响原有的
+        
+        commit('SET_ROUTES',filterAsyncRoutes(cloneDeep(allAsyncRoutes),data.routes))
 
         resolve(data)
       }).catch(error => {

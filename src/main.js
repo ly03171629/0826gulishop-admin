@@ -22,6 +22,9 @@ import HintButton from '@/components/HintButton'
 
 
 import * as API from '@/api'
+import {hasBtnPermission} from '@/utils/permission'
+
+
 // $API = {
 //   treademark:{},
 //   attr:{},
@@ -56,6 +59,7 @@ Vue.use(ElementUI, { locale })
 
 Vue.config.productionTip = false
 Vue.prototype.$API = API //把所有的接口请求函数最终整体的对象挂到vue原型身上，以便在每个组件当中去使用
+Vue.prototype.$hasBP = hasBtnPermission
 // API = {
 //     trademark：{getPageList}
 //     attr：{}
